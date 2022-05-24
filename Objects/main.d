@@ -14,3 +14,4 @@
 .\objects\main.o: D:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\StdPeriph_Driver\inc\stm32f10x_tim.h
 .\objects\main.o: D:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\StdPeriph_Driver\inc\misc.h
 .\objects\main.o: delay.h
+.\objects\main.o: D:\Apps\ARM\ARMCC\Bin\..\include\stdio.h

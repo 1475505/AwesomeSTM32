@@ -3,7 +3,7 @@
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_tim.h"
 #include "delay.h"
-
+#include <stdio.h>
 
 
 #define LED_PIN1	GPIO_Pin_7	//PA.7
@@ -18,6 +18,13 @@
 
 void TIM2_INT_Init(void);
 
+volatile uint32_t msTicks; // counts 1ms timeTicks
+
+void Delay (uint32_t dlyTicks) {// no interrupt
+  uint32_t curTicks;
+  curTicks = msTicks;
+  while ((msTicks - curTicks) < dlyTicks) { __NOP(); }
+}
 
 void TIM2_IRQHandler()
 {
@@ -123,13 +130,21 @@ void LED_Write(int state) {
 			  break;
 		}
 }
+int InitLED(int state);
+int getnum(int a, int b);
+// 7 segment font (0-9)
+// D7=DP, D6=A, D5=B, D4=C, D3=D, D2=E, D1=F, D0=G
+const uint8_t font[10] =
+{
+	0x7E, 0x30, 0x6D, 0x79, 0x33, 0x5B, 0x5F, 0x70, 0x7F, 0x7B
+};
+uint8_t buffer[4];
 
 int main(void)
 {
 	int last = 0;
-	
+	SystemInit ();
 	DelayInit();
-	
 	// Initialize timer interrupt
 	TIM2_INT_Init();
 	
@@ -146,17 +161,20 @@ int main(void)
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_Init(GPIOC, &GPIO_InitStruct);
 	
-	
-	
-  SystemCoreClockUpdate();
+	// above is for interrupt control. May delete.
 	
 	
 	Button_Init();
 	LED_Init();
+	//TODO: while 不按某个按键不执行后面的流程
+	last = InitLED(Button_Read());
+	LED_Write(last);
+	//TODO: while 不按某个按键不执行后面的流程
 	while(1) {
-		last = Button_Read();
+		//TODO: show 七段显示译码器结果输出在串口
+		last = getnum(Button_Read(), last);
 		LED_Write(last);
-		DelayMs(1000);//interval about 0.6s
+		DelayMs(500);//interval about 0.6s
 	}
 	
 }
@@ -190,4 +208,66 @@ void TIM2_INT_Init()
 	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x00;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStruct);
+}
+
+int InitLED(int state){
+	  switch(state){
+			case 0:
+				GPIO_ResetBits(GPIOA, LED_PIN1);		//0
+			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
+			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
+				return 3;
+			case 1:
+			case 2:
+			case 4:
+				GPIO_SetBits(GPIOA, LED_PIN1);			//1
+			  GPIO_ResetBits(GPIOA, LED_PIN2);		//0
+			  GPIO_ResetBits(GPIOA, LED_PIN3);		//0
+			  return 4;
+			case 5:
+			case 3:
+			case 6:
+				GPIO_SetBits(GPIOA, LED_PIN1);			//1
+			  GPIO_ResetBits(GPIOA, LED_PIN2);		//0
+			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
+				return 5;
+			case 7:
+				GPIO_SetBits(GPIOA, LED_PIN1);			//1
+			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
+			  GPIO_ResetBits(GPIOA, LED_PIN3);		//0
+				return 6;
+			default:
+				GPIO_SetBits(GPIOA, LED_PIN1);			//1
+			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
+			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
+			  return 7;
+		}
+}
+
+int getnum(int a, int b){
+	int ret = b;
+	switch(a){
+	    case 0:
+				ret-=2;
+				break;
+			case 1:
+			case 2:
+			case 4:
+				ret--;
+			  return 4;
+			case 5:
+			case 3:
+			case 6:
+				ret++;
+				break;
+			case 7:
+				ret+=2;
+			  printf("So exciting!");
+				break;
+			default:
+				return b;
+	}
+	if (ret > 7) return 7;
+	if (ret < 0) return 0;
+  return ret;	
 }
