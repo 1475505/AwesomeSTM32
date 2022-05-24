@@ -15,6 +15,8 @@
 #define BUTTON_PIN1 GPIO_Pin_3	//PC.3.temp
 #define BUTTON_PIN2 GPIO_Pin_2	//PC.2.humid
 #define BUTTON_PIN3 GPIO_Pin_1	//PC.1.light
+#define CTRLKEY GPIO_Pin_0	
+
 
 void TIM2_INT_Init(void);
 
@@ -83,6 +85,19 @@ void LED_Init(void) {
 
 int Button_Read(void) {
 	return GPIO_ReadInputDataBit(GPIOC, BUTTON_PIN1) * 4 + GPIO_ReadInputDataBit(GPIOC, BUTTON_PIN2) * 2 + GPIO_ReadInputDataBit(GPIOC, BUTTON_PIN3);
+}
+
+int ReadKeyDown(void)
+{
+  
+  if(GPIO_ReadInputDataBit(GPIOC, CTRLKEY))
+  {
+    return 1; 
+  }	
+  else 
+  {
+    return -1;
+  }							      
 }
 
 void LED_Write(int state) {
@@ -167,6 +182,7 @@ int main(void)
 	Button_Init();
 	LED_Init();
 	//TODO: while 不按某个按键不执行后面的流程
+	while (ReadKeyDown() != 1);//这种形式做到了实现，但是有bug，虽然可以运行
 	last = InitLED(Button_Read());
 	LED_Write(last);
 	//TODO: while 不按某个按键不执行后面的流程

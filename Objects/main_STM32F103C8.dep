@@ -1,6 +1,6 @@
 Dependencies for Project 'main', Target 'STM32F103C8': (DO NOT MODIFY !)
 CompilerVersion: 5060960::V5.06 update 7 (build 960)::.\ARMCC
-F (.\main.c)(0x628CD34F)(-c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I.\RTE\Device\STM32F103C8-I.\RTE\_STM32F103C8-ID:\Apps\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include-ID:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\Include-ID:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\StdPeriph_Driver\inc-ID:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0-D__UVISION_VERSION="536" -D_RTE_ -DSTM32F10X_MD -D_RTE_-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
+F (.\main.c)(0x628CEBB9)(-c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I.\RTE\Device\STM32F103C8-I.\RTE\_STM32F103C8-ID:\Apps\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include-ID:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\Include-ID:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\StdPeriph_Driver\inc-ID:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0-D__UVISION_VERSION="536" -D_RTE_ -DSTM32F10X_MD -D_RTE_-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
 I (D:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\Include\stm32f10x.h)(0x61AD795E)
 I (.\RTE\_STM32F103C8\RTE_Components.h)(0x628CB88E)
 I (D:\Apps\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include\core_cm3.h)(0x60D3E8E2)
