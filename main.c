@@ -2,9 +2,10 @@
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_tim.h"
+#include "stm32f10x_usart.h"
 #include "delay.h"
+#include "xprintf.h"
 #include <stdio.h>
-
 
 #define LED_PIN1	GPIO_Pin_7	//PA.7
 #define LED_PIN2	GPIO_Pin_8	//PA.8
@@ -17,6 +18,55 @@
 #define BUTTON_PIN3 GPIO_Pin_1	//PC.1.light
 #define CTRLKEY GPIO_Pin_0	
 
+
+// 定义调试串口
+#define DEBUG_UART          USART1
+
+// 是否输出调试信息
+#define DEBUG_PRINTF
+
+#ifdef DEBUG_PRINTF
+#define debug(FORMAT, ...)  printf(FORMAT, ##__VA_ARGS__)
+#else
+#define debug(FORMAT, ...)
+#endif
+
+int fputc(int ch, FILE *f)//重定向，让printf输出到串口
+{
+    USART_SendData(DEBUG_UART, (uint8_t) ch);
+
+    while (USART_GetFlagStatus(DEBUG_UART, USART_FLAG_TXE) == RESET);
+    return ch;
+}
+
+void USART1_Init(void)
+{//串口初始化
+  USART_InitTypeDef USART_InitStructure;
+	GPIO_InitTypeDef GPIO_InitStructure;
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA |RCC_APB2Periph_USART1|RCC_APB2Periph_AFIO , ENABLE);
+
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+  
+  // Configure the USART1_Rx as input floating
+  GPIO_InitStructure.GPIO_Mode =GPIO_Mode_IN_FLOATING ;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+	
+  USART_InitStructure.USART_BaudRate = 115200;
+  USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+  USART_InitStructure.USART_StopBits = USART_StopBits_1;
+  USART_InitStructure.USART_Parity = USART_Parity_No ;
+  USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+  USART_InitStructure.USART_Mode = USART_Mode_Tx;
+  
+  /* Configure the USARTx */ 
+  USART_Init(USART1, &USART_InitStructure);
+  /* Enable the USARTx */
+  USART_Cmd(USART1, ENABLE);
+}
 
 void TIM2_INT_Init(void);
 
@@ -101,47 +151,62 @@ int ReadKeyDown(void)
 }
 
 void LED_Write(int state) {
-
 	  switch(state){
 			case 0:
 				GPIO_ResetBits(GPIOA, LED_PIN1);		//0
 			  GPIO_ResetBits(GPIOA, LED_PIN2);		//0
 			  GPIO_ResetBits(GPIOA, LED_PIN3);		//0
+				xprintf(0);
+			printf("0\n");
 				break;
 			case 1:
 				GPIO_ResetBits(GPIOA, LED_PIN1);		//0
 			  GPIO_ResetBits(GPIOA, LED_PIN2);		//0
 			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
+				//xprintf(1);
+			printf("1\n");
 				break;
 			case 2:
 				GPIO_ResetBits(GPIOA, LED_PIN1);		//0
 			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
 			  GPIO_ResetBits(GPIOA, LED_PIN3);		//0
+			  //xprintf(2);
+			printf("2\n");
 				break;
 			case 3:
 				GPIO_ResetBits(GPIOA, LED_PIN1);		//0
 			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
 			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
+			  //xprintf(3);
+			printf("3\n");
 				break;
 			case 4:
 				GPIO_SetBits(GPIOA, LED_PIN1);			//1
 			  GPIO_ResetBits(GPIOA, LED_PIN2);		//0
 			  GPIO_ResetBits(GPIOA, LED_PIN3);		//0
+			  //xprintf(4);
+			printf("4\n");
 			  break;
 			case 5:
 				GPIO_SetBits(GPIOA, LED_PIN1);			//1
 			  GPIO_ResetBits(GPIOA, LED_PIN2);		//0
 			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
+			  //xprintf(5);
+			printf("5\n");
 				break;
 			case 6:
 				GPIO_SetBits(GPIOA, LED_PIN1);			//1
 			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
 			  GPIO_ResetBits(GPIOA, LED_PIN3);		//0
+			  //xprintf(6);
+			printf("6\n");
 				break;
 			default:
 				GPIO_SetBits(GPIOA, LED_PIN1);			//1
 			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
 			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
+			  //xprintf(7);
+			printf("7\n");
 			  break;
 		}
 }
@@ -160,6 +225,7 @@ int main(void)
 	int last = 0;
 	SystemInit ();
 	DelayInit();
+	USART1_Init();
 	// Initialize timer interrupt
 	TIM2_INT_Init();
 	
@@ -278,7 +344,7 @@ int getnum(int a, int b){
 				break;
 			case 7:
 				ret+=2;
-			  printf("So exciting!");
+			  //printf("So exciting!");
 				break;
 			default:
 				return b;

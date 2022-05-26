@@ -12,6 +12,10 @@
 .\objects\main.o: D:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\Include\stm32f10x.h
 .\objects\main.o: D:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\StdPeriph_Driver\inc\stm32f10x_rcc.h
 .\objects\main.o: D:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\StdPeriph_Driver\inc\stm32f10x_tim.h
+.\objects\main.o: D:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\StdPeriph_Driver\inc\stm32f10x_usart.h
 .\objects\main.o: D:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\StdPeriph_Driver\inc\misc.h
 .\objects\main.o: delay.h
+.\objects\main.o: xprintf.h
 .\objects\main.o: D:\Apps\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\main.o: D:\Apps\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\main.o: D:\Apps\ARM\ARMCC\Bin\..\include\string.h

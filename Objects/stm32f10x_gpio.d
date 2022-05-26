@@ -13,4 +13,5 @@
 .\objects\stm32f10x_gpio.o: D:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\StdPeriph_Driver\inc\stm32f10x_rcc.h
 .\objects\stm32f10x_gpio.o: D:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\Include\stm32f10x.h
 .\objects\stm32f10x_gpio.o: D:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\StdPeriph_Driver\inc\stm32f10x_tim.h
+.\objects\stm32f10x_gpio.o: D:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\StdPeriph_Driver\inc\stm32f10x_usart.h
 .\objects\stm32f10x_gpio.o: D:\Apps\ARM\PACK\Keil\STM32F1xx_DFP\2.4.0\Device\StdPeriph_Driver\inc\misc.h
