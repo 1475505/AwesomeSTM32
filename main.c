@@ -31,6 +31,7 @@
 #define debug(FORMAT, ...)
 #endif
 
+
 int fputc(int ch, FILE *f)//重定向，让printf输出到串口
 {
     USART_SendData(DEBUG_UART, (uint8_t) ch);
@@ -38,6 +39,7 @@ int fputc(int ch, FILE *f)//重定向，让printf输出到串口
     while (USART_GetFlagStatus(DEBUG_UART, USART_FLAG_TXE) == RESET);
     return ch;
 }
+
 
 void USART1_Init(void)
 {//串口初始化
@@ -185,9 +187,8 @@ int xprintf(int num)
     freopen("out.txt", "w", stdout);
 #endif
 	  int i;
-	  char ch[10000];
-    strcpy(ch,SEVENSEG);
-	
+	  char ch[300];
+		strcpy(ch, SEVENSEG);
     num = font[num];
 
     G = num & 1;
@@ -279,7 +280,7 @@ int main(void)
 	Button_Init();
 	LED_Init();
 	//TODO: while 不按某个按键不执行后面的流程
-	//while (ReadKeyDown() != 1);//这种形式做到了实现，但是有bug，虽然可以运行
+	while (ReadKeyDown() != 1);//这种形式做到了实现，但是有bug，虽然可以运行
 	last = InitLED(Button_Read());
 	LED_Write(last);
 	//TODO: while 不按某个按键不执行后面的流程
