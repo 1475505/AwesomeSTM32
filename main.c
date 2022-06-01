@@ -4,7 +4,7 @@
 #include "stm32f10x_tim.h"
 #include "stm32f10x_usart.h"
 #include "delay.h"
-#include "xprintf.h"
+#include <string.h>
 #include <stdio.h>
 
 #define LED_PIN1	GPIO_Pin_7	//PA.7
@@ -150,66 +150,8 @@ int ReadKeyDown(void)
   }							      
 }
 
-void LED_Write(int state) {
-	  switch(state){
-			case 0:
-				GPIO_ResetBits(GPIOA, LED_PIN1);		//0
-			  GPIO_ResetBits(GPIOA, LED_PIN2);		//0
-			  GPIO_ResetBits(GPIOA, LED_PIN3);		//0
-				xprintf(0);
-			printf("0\n");
-				break;
-			case 1:
-				GPIO_ResetBits(GPIOA, LED_PIN1);		//0
-			  GPIO_ResetBits(GPIOA, LED_PIN2);		//0
-			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
-				//xprintf(1);
-			printf("1\n");
-				break;
-			case 2:
-				GPIO_ResetBits(GPIOA, LED_PIN1);		//0
-			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
-			  GPIO_ResetBits(GPIOA, LED_PIN3);		//0
-			  //xprintf(2);
-			printf("2\n");
-				break;
-			case 3:
-				GPIO_ResetBits(GPIOA, LED_PIN1);		//0
-			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
-			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
-			  //xprintf(3);
-			printf("3\n");
-				break;
-			case 4:
-				GPIO_SetBits(GPIOA, LED_PIN1);			//1
-			  GPIO_ResetBits(GPIOA, LED_PIN2);		//0
-			  GPIO_ResetBits(GPIOA, LED_PIN3);		//0
-			  //xprintf(4);
-			printf("4\n");
-			  break;
-			case 5:
-				GPIO_SetBits(GPIOA, LED_PIN1);			//1
-			  GPIO_ResetBits(GPIOA, LED_PIN2);		//0
-			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
-			  //xprintf(5);
-			printf("5\n");
-				break;
-			case 6:
-				GPIO_SetBits(GPIOA, LED_PIN1);			//1
-			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
-			  GPIO_ResetBits(GPIOA, LED_PIN3);		//0
-			  //xprintf(6);
-			printf("6\n");
-				break;
-			default:
-				GPIO_SetBits(GPIOA, LED_PIN1);			//1
-			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
-			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
-			  //xprintf(7);
-			printf("7\n");
-			  break;
-		}
-}
+void LED_Write(int state);
+
 int InitLED(int state);
 int getnum(int a, int b);
 // 7 segment font (0-9)
@@ -218,7 +160,96 @@ const uint8_t font[10] =
 {
 	0x7E, 0x30, 0x6D, 0x79, 0x33, 0x5B, 0x5F, 0x70, 0x7F, 0x7B
 };
+
 uint8_t buffer[4];
+
+int A, B, C, D, E, F, G;
+#define SEVENSEG \
+    "\033[2J\033[1;1f\n\
+     AAAAAAAAA\n\
+    FF       BB\n\
+    FF       BB\n\
+    FF       BB\n\
+    FF       BB\n\
+    GGGGGGGGGG\n\
+   EE       CC\n\
+   EE       CC\n\
+   EE       CC\n\
+   EE       CC\n\
+    DDDDDDDDD"
+#define LIGHT "\033[40;31m|\033[0m"
+int xprintf(int num)
+{
+#ifdef LOCAL
+    freopen("in.txt", "r", stdin);
+    freopen("out.txt", "w", stdout);
+#endif
+	  int i;
+	  char ch[10000];
+    strcpy(ch,SEVENSEG);
+	
+    num = font[num];
+
+    G = num & 1;
+    num >>= 1;
+    F = num & 1;
+    num >>= 1;
+    E = num & 1;
+    num >>= 1;
+    D = num & 1;
+    num >>= 1;
+    C = num & 1;
+    num >>= 1;
+    B = num & 1;
+    num >>= 1;
+    A = num & 1;
+    num >>= 1;
+    A++;
+    B++;
+    C++;
+    D++;
+    E++;
+    F++;
+    G++;
+
+    for (i = 0; i < strlen(ch); i++) {
+        switch (ch[i]) {
+            case 'A':
+                ch[i] = A;
+                break;
+            case 'B':
+                ch[i] = B;
+                break;
+            case 'C':
+                ch[i] = C;
+                break;
+            case 'D':
+                ch[i] = D;
+                break;
+            case 'E':
+                ch[i] = E;
+                break;
+            case 'F':
+                ch[i] = F;
+                break;
+            case 'G':
+                ch[i] = G;
+                break;
+            default:
+                break;
+        }
+    }
+    for (i = 0; i < strlen(ch); i++) {
+        if (ch[i] == 2) {
+            printf("%s", LIGHT);
+        } else {
+            printf("%c", ch[i]);
+        }
+    }
+
+    return 0;
+}
+
 
 int main(void)
 {
@@ -248,7 +279,7 @@ int main(void)
 	Button_Init();
 	LED_Init();
 	//TODO: while 不按某个按键不执行后面的流程
-	while (ReadKeyDown() != 1);//这种形式做到了实现，但是有bug，虽然可以运行
+	//while (ReadKeyDown() != 1);//这种形式做到了实现，但是有bug，虽然可以运行
 	last = InitLED(Button_Read());
 	LED_Write(last);
 	//TODO: while 不按某个按键不执行后面的流程
@@ -344,7 +375,7 @@ int getnum(int a, int b){
 				break;
 			case 7:
 				ret+=2;
-			  //printf("So exciting!");
+			  printf("So exciting!");
 				break;
 			default:
 				return b;
@@ -352,4 +383,51 @@ int getnum(int a, int b){
 	if (ret > 7) return 7;
 	if (ret < 0) return 0;
   return ret;	
+}
+
+void LED_Write(int state){
+	  switch(state){
+			case 0:
+				GPIO_ResetBits(GPIOA, LED_PIN1);		//0
+			  GPIO_ResetBits(GPIOA, LED_PIN2);		//0
+			  GPIO_ResetBits(GPIOA, LED_PIN3);		//0
+				break;
+			case 1:
+				GPIO_ResetBits(GPIOA, LED_PIN1);		//0
+			  GPIO_ResetBits(GPIOA, LED_PIN2);		//0
+			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
+				break;
+			case 2:
+				GPIO_ResetBits(GPIOA, LED_PIN1);		//0
+			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
+			  GPIO_ResetBits(GPIOA, LED_PIN3);		//0
+				break;
+			case 3:
+				GPIO_ResetBits(GPIOA, LED_PIN1);		//0
+			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
+			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
+				break;
+			case 4:
+				GPIO_SetBits(GPIOA, LED_PIN1);			//1
+			  GPIO_ResetBits(GPIOA, LED_PIN2);		//0
+			  GPIO_ResetBits(GPIOA, LED_PIN3);		//0
+			  break;
+			case 5:
+				GPIO_SetBits(GPIOA, LED_PIN1);			//1
+			  GPIO_ResetBits(GPIOA, LED_PIN2);		//0
+			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
+				break;
+			case 6:
+				GPIO_SetBits(GPIOA, LED_PIN1);			//1
+			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
+			  GPIO_ResetBits(GPIOA, LED_PIN3);		//0
+				break;
+			default:
+				GPIO_SetBits(GPIOA, LED_PIN1);			//1
+			  GPIO_SetBits(GPIOA, LED_PIN2);			//1
+			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
+			  break;
+		}
+		printf("%d\n", state);
+		xprintf(state);
 }

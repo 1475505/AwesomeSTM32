@@ -393,11 +393,6 @@
               <FileType>1</FileType>
               <FilePath>.\delay.c</FilePath>
             </File>
-            <File>
-              <FileName>xprintf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\xprintf.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
