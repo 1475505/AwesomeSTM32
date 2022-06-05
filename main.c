@@ -4,6 +4,7 @@
 #include "stm32f10x_tim.h"
 #include "stm32f10x_usart.h"
 #include "delay.h"
+#include <assert.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -173,12 +174,12 @@ int A, B, C, D, E, F, G;
     FF       BB\n\
     FF       BB\n\
     FF       BB\n\
-    GGGGGGGGGG\n\
-   EE       CC\n\
-   EE       CC\n\
-   EE       CC\n\
-   EE       CC\n\
-    DDDDDDDDD"
+     GGGGGGGGG\n\
+    EE       CC\n\
+    EE       CC\n\
+    EE       CC\n\
+    EE       CC\n\
+     DDDDDDDDD"
 #define LIGHT "\033[40;31m|\033[0m"
 int xprintf(int num)
 {
@@ -279,16 +280,14 @@ int main(void)
 	
 	Button_Init();
 	LED_Init();
-	//TODO: while 不按某个按键不执行后面的流程
-	while (ReadKeyDown() != 1);//这种形式做到了实现，但是有bug，虽然可以运行
+	while (ReadKeyDown() != 1);//按下portc.0后，再初始化强度
 	last = InitLED(Button_Read());
 	LED_Write(last);
-	//TODO: while 不按某个按键不执行后面的流程
 	while(1) {
-		//TODO: show 七段显示译码器结果输出在串口
-		last = getnum(Button_Read(), last);
-		LED_Write(last);
 		DelayMs(500);//interval about 0.6s
+		last = getnum(Button_Read(), last);
+		assert(last >= 0);//BUG: 上一个函数不会对last进行越界处理
+		LED_Write(last);
 	}
 	
 }
@@ -359,34 +358,39 @@ int InitLED(int state){
 }
 
 int getnum(int a, int b){
-	int ret = b;
 	switch(a){
 	    case 0:
-				ret-=2;
+				if (b < 2)	{
+					b = 0;
+					return 0;
+				}
+			  b -= 2;
 				break;
 			case 1:
 			case 2:
 			case 4:
-				ret--;
-			  return 4;
+				b--;
+			  return b;
 			case 5:
 			case 3:
 			case 6:
-				ret++;
-				break;
+				b++;
+				return b;
 			case 7:
-				ret+=2;
+				b+=2;
 			  printf("So exciting!");
 				break;
 			default:
 				return b;
 	}
-	if (ret > 7) return 7;
-	if (ret < 0) return 0;
-  return ret;	
+	if (b > 7) return 7;
+	if (b < 0) return 0;
+  return b;	
 }
 
 void LED_Write(int state){
+	  xprintf(state);
+	  if (state < 0) state = 0;
 	  switch(state){
 			case 0:
 				GPIO_ResetBits(GPIOA, LED_PIN1);		//0
@@ -429,6 +433,5 @@ void LED_Write(int state){
 			  GPIO_SetBits(GPIOA, LED_PIN3);			//1
 			  break;
 		}
-		printf("%d\n", state);
-		xprintf(state);
+		printf("\n%d\n", state);
 }
