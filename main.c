@@ -370,12 +370,12 @@ int getnum(int a, int b){
 			case 2:
 			case 4:
 				b--;
-			  return b;
+			  break;
 			case 5:
 			case 3:
 			case 6:
 				b++;
-				return b;
+				break;
 			case 7:
 				b+=2;
 			  printf("So exciting!");
@@ -387,6 +387,8 @@ int getnum(int a, int b){
 	if (b < 0) return 0;
   return b;	
 }
+
+
 
 void LED_Write(int state){
 	  xprintf(state);
